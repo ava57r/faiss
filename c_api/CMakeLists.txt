@@ -31,7 +31,6 @@ set(FAISS_C_SRC
   utils/distances_c.cpp
 )
 add_library(faiss_c ${FAISS_C_SRC})
-target_link_libraries(faiss_c PRIVATE faiss)
 
 function(faiss_install_headers headers p)
   foreach(h ${headers})
@@ -49,6 +48,12 @@ file(GLOB FAISS_C_API_HEADERS
      "utils/*.h")
 
 faiss_install_headers("${FAISS_C_API_HEADERS}" c_api)
+
+if(FAISS_OPT_LEVEL STREQUAL "avx2")
+  target_link_libraries(faiss_c PRIVATE faiss_avx2)
+else()
+  target_link_libraries(faiss_c PRIVATE faiss)
+endif()
 
 add_executable(example_c EXCLUDE_FROM_ALL example_c.c)
 target_link_libraries(example_c PRIVATE faiss_c)
